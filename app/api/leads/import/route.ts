@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
           notes: lead.notes?.trim() || null,
         };
       })
-      .filter((lead: Lead | null) => lead !== null);
+      .filter((lead): lead is Lead => lead !== null);
 
     if (validLeads.length === 0) {
       console.error('[CSV Import] No valid leads after validation');
