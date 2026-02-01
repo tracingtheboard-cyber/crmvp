@@ -56,23 +56,16 @@ export async function POST(request: NextRequest) {
 
     // Validate and format leads
     const validLeads: Lead[] = leads
-      .map((lead: any) => {
-        // Ensure required fields
-        if (!lead.name || lead.name.trim() === '') {
-          return null;
-        }
-
-        return {
-          name: lead.name.trim(),
-          email: lead.email?.trim() || null,
-          phone: lead.phone?.trim() || null,
-          company: lead.company?.trim() || null,
-          source: lead.source?.trim() || null,
-          status: (lead.status?.trim() || 'new') as Lead['status'],
-          notes: lead.notes?.trim() || null,
-        };
-      })
-      .filter((lead): lead is Lead => lead !== null);
+      .filter((lead: any) => lead.name && lead.name.trim() !== '')
+      .map((lead: any) => ({
+        name: lead.name.trim(),
+        email: lead.email?.trim() || null,
+        phone: lead.phone?.trim() || null,
+        company: lead.company?.trim() || null,
+        source: lead.source?.trim() || null,
+        status: (lead.status?.trim() || 'new') as Lead['status'],
+        notes: lead.notes?.trim() || null,
+      }));
 
     if (validLeads.length === 0) {
       console.error('[CSV Import] No valid leads after validation');

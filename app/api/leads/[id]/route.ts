@@ -15,14 +15,15 @@ function getSupabaseClient() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabaseAdmin = getSupabaseClient();
     const { data, error } = await supabaseAdmin
       .from('leads')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) throw error;
@@ -34,9 +35,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabaseAdmin = getSupabaseClient();
     const body: Partial<Lead> = await request.json();
     
@@ -53,7 +55,7 @@ export async function PUT(
     const { data, error } = await supabaseAdmin
       .from('leads')
       .update(leadData)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -70,14 +72,15 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const supabaseAdmin = getSupabaseClient();
     const { error } = await supabaseAdmin
       .from('leads')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) throw error;
     return NextResponse.json({ success: true });
