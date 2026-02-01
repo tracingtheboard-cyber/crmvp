@@ -1,0 +1,4 @@
+name,email,phone,company,source,status,notes
+John Doe,john.doe@example.com,123-456-7890,Acme Corp,Website,new,Interested in product demo
+Jane Smith,jane.smith@example.com,098-765-4321,Tech Inc,Referral,contacted,Follow up next week
+Bob Johnson,bob@example.com,555-1234,Startup Co,Email,qualified,Ready to purchase
