@@ -4,12 +4,18 @@ import { useEffect, useState } from 'react';
 import { Enquiry } from '@/types';
 import EnquiryForm from '@/components/EnquiryForm';
 import EnquiryCard from '@/components/EnquiryCard';
+import ConversionModal from '@/components/ConversionModal';
+import EnquiryImport from '@/components/EnquiryImport';
+import VisitModal from '@/components/VisitModal';
 
 export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [editingEnquiry, setEditingEnquiry] = useState<Enquiry | null>(null);
+  const [convertingEnquiry, setConvertingEnquiry] = useState<Enquiry | null>(null);
+  const [visitingEnquiry, setVisitingEnquiry] = useState<Enquiry | null>(null);
 
   useEffect(() => {
     fetchEnquiries();
@@ -19,15 +25,13 @@ export default function EnquiriesPage() {
     try {
       const res = await fetch('/api/enquiries');
       const data = await res.json();
-      
-      // Check if response is an error or not an array
+
       if (!res.ok) {
         console.error('API error:', data.error);
         setEnquiries([]);
         return;
       }
-      
-      // Ensure data is an array
+
       if (Array.isArray(data)) {
         setEnquiries(data);
       } else {
@@ -57,9 +61,27 @@ export default function EnquiriesPage() {
     setShowForm(true);
   };
 
+  const handleConvert = (enquiry: Enquiry) => {
+    setConvertingEnquiry(enquiry);
+  };
+
+  const handleAddVisit = (enquiry: Enquiry) => {
+    setVisitingEnquiry(enquiry);
+  };
+
   const handleFormClose = () => {
     setShowForm(false);
     setEditingEnquiry(null);
+    fetchEnquiries();
+  };
+
+  const handleConversionClose = () => {
+    setConvertingEnquiry(null);
+    fetchEnquiries();
+  };
+
+  const handleVisitClose = () => {
+    setVisitingEnquiry(null);
     fetchEnquiries();
   };
 
@@ -71,19 +93,50 @@ export default function EnquiriesPage() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Enquiries</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
-        >
-          + Add Enquiry
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => setShowImport(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          >
+            📥 Import CSV
+          </button>
+          <button
+            onClick={() => setShowForm(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          >
+            + Add Enquiry
+          </button>
+        </div>
       </div>
+
+      {showImport && (
+        <EnquiryImport
+          onImportComplete={fetchEnquiries}
+          onClose={() => setShowImport(false)}
+        />
+      )}
 
       {showForm && (
         <EnquiryForm
           enquiry={editingEnquiry}
           onClose={handleFormClose}
           onSave={handleFormClose}
+        />
+      )}
+
+      {convertingEnquiry && (
+        <ConversionModal
+          enquiry={convertingEnquiry}
+          onClose={() => setConvertingEnquiry(null)}
+          onConvert={handleConversionClose}
+        />
+      )}
+
+      {visitingEnquiry && (
+        <VisitModal
+          enquiry={visitingEnquiry}
+          onClose={() => setVisitingEnquiry(null)}
+          onSave={handleVisitClose}
         />
       )}
 
@@ -94,6 +147,8 @@ export default function EnquiriesPage() {
             enquiry={enquiry}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onConvert={handleConvert}
+            onAddVisit={handleAddVisit}
           />
         ))}
       </div>

@@ -16,7 +16,9 @@ export interface Enquiry {
   lead_id?: number;
   subject: string;
   message?: string;
-  status: 'open' | 'in_progress' | 'resolved' | 'closed';
+  status: 'open' | 'in_progress' | 'visit' | 'resolved' | 'closed';
+  visit_date?: string;
+  visit_type?: 'walkin' | 'call';
   priority: 'low' | 'medium' | 'high';
   assigned_to?: string;
   created_at?: string;
@@ -29,6 +31,7 @@ export interface Enrolment {
   lead_id?: number;
   course_name: string;
   course_date?: string;
+  intake?: 'February' | 'May' | 'August' | 'November';
   amount?: number;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   payment_status: 'unpaid' | 'partial' | 'paid';

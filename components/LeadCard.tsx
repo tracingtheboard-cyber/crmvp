@@ -6,9 +6,10 @@ interface LeadCardProps {
   lead: Lead;
   onEdit: (lead: Lead) => void;
   onDelete: (id: number) => void;
+  onAddVisit?: (lead: Lead) => void;
 }
 
-export default function LeadCard({ lead, onEdit, onDelete }: LeadCardProps) {
+export default function LeadCard({ lead, onEdit, onDelete, onAddVisit }: LeadCardProps) {
   const statusColors: Record<string, string> = {
     new: 'bg-blue-100 text-blue-800',
     contacted: 'bg-yellow-100 text-yellow-800',
@@ -49,6 +50,12 @@ export default function LeadCard({ lead, onEdit, onDelete }: LeadCardProps) {
           className="flex-1 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm"
         >
           Edit
+        </button>
+        <button
+          onClick={() => onAddVisit && onAddVisit(lead)}
+          className="flex-1 px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200 text-sm"
+        >
+          Add Visit
         </button>
         <button
           onClick={() => lead.id && onDelete(lead.id)}

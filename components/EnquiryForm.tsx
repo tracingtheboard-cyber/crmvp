@@ -106,15 +106,51 @@ export default function EnquiryForm({ enquiry, onClose, onSave }: EnquiryFormPro
             <label className="block text-sm font-medium mb-1">Status</label>
             <select
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as Enquiry['status'] })}
+              onChange={(e) => {
+                const newStatus = e.target.value as Enquiry['status'];
+                const updates: Partial<Enquiry> = { status: newStatus };
+                if (newStatus === 'visit' && !formData.visit_date) {
+                  updates.visit_date = new Date().toISOString().split('T')[0]; // Default to today
+                }
+                setFormData({ ...formData, ...updates });
+              }}
               className="w-full px-3 py-2 border rounded-lg"
             >
               <option value="open">Open</option>
               <option value="in_progress">In Progress</option>
+              <option value="visit">Visit</option>
               <option value="resolved">Resolved</option>
               <option value="closed">Closed</option>
             </select>
           </div>
+
+          {formData.status === 'visit' && (
+            <div className="grid grid-cols-2 gap-4 pl-4 border-l-2 border-green-200">
+              <div>
+                <label className="block text-sm font-medium mb-1">Visit Date *</label>
+                <input
+                  type="date"
+                  required={formData.status === 'visit'}
+                  value={formData.visit_date ? new Date(formData.visit_date).toISOString().split('T')[0] : ''}
+                  onChange={(e) => setFormData({ ...formData, visit_date: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Visit Type</label>
+                <select
+                  value={formData.visit_type || ''}
+                  onChange={(e) => setFormData({ ...formData, visit_type: e.target.value as any })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                >
+                  <option value="">Select Type...</option>
+                  <option value="walkin">Walk-in</option>
+                  <option value="call">Call</option>
+                </select>
+              </div>
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium mb-1">Priority</label>
             <select

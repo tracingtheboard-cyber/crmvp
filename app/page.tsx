@@ -74,7 +74,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
           <div className="text-2xl font-bold text-blue-600">{stats.leads}</div>
-          <div className="text-gray-600 mt-2">Total Leads</div>
+          <div className="text-gray-600 mt-2">Total Enquiries (Imported)</div>
           <Link href="/leads" className="text-blue-600 text-sm mt-2 inline-block hover:underline">
             View all →
           </Link>
@@ -98,7 +98,7 @@ export default function Dashboard() {
       {/* Recent Items */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white p-6 rounded-lg shadow">
-          <h2 className="text-xl font-semibold mb-4">Recent Leads</h2>
+          <h2 className="text-xl font-semibold mb-4">Recent Enquiries (Imported)</h2>
           <div className="space-y-3">
             {stats.recentLeads.length > 0 ? (
               stats.recentLeads.map((lead) => (

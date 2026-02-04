@@ -6,9 +6,11 @@ interface EnquiryCardProps {
   enquiry: Enquiry;
   onEdit: (enquiry: Enquiry) => void;
   onDelete: (id: number) => void;
+  onConvert?: (enquiry: Enquiry) => void;
+  onAddVisit?: (enquiry: Enquiry) => void;
 }
 
-export default function EnquiryCard({ enquiry, onEdit, onDelete }: EnquiryCardProps) {
+export default function EnquiryCard({ enquiry, onEdit, onDelete, onConvert, onAddVisit }: EnquiryCardProps) {
   const statusColors: Record<string, string> = {
     open: 'bg-blue-100 text-blue-800',
     in_progress: 'bg-yellow-100 text-yellow-800',
@@ -57,10 +59,24 @@ export default function EnquiryCard({ enquiry, onEdit, onDelete }: EnquiryCardPr
           Edit
         </button>
         <button
+          onClick={() => onAddVisit && onAddVisit(enquiry)}
+          className="flex-1 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm"
+        >
+          Add Visit
+        </button>
+        <button
           onClick={() => enquiry.id && onDelete(enquiry.id)}
           className="flex-1 px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm"
         >
           Delete
+        </button>
+      </div>
+      <div className="mt-2">
+        <button
+          onClick={() => onConvert && onConvert(enquiry)}
+          className="w-full px-3 py-1 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 text-sm font-medium"
+        >
+          Convert to Enrollment
         </button>
       </div>
     </div>
