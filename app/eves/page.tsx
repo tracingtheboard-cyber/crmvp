@@ -146,13 +146,13 @@ export default function EvesReportPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">EVES 月报表</h1>
+        <h1 className="text-3xl font-bold">EVES Monthly Report</h1>
       </div>
 
       <div className="mb-6 flex flex-col md:flex-row md:items-end md:space-x-4 space-y-3 md:space-y-0">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            选择月份
+            Select month
           </label>
           <input
             type="month"
@@ -172,7 +172,7 @@ export default function EvesReportPage() {
 
       <div className="mb-6">
         <p className="text-sm text-gray-500">
-          当前版本：按 {monthLabel} 统计。
+          Statistics for {monthLabel}.
         </p>
       </div>
 
@@ -206,15 +206,15 @@ export default function EvesReportPage() {
 
           <div className="bg-white p-4 rounded-lg shadow text-sm text-gray-500 space-y-1">
             <div>
-              说明：
+              <b>Legend:</b>
               <br />
-              <b>Enquiry (E)</b>: 创建时间在当月的 Enquiry 数量。
+              <b>Enquiry (E)</b>: Enquiries created in the selected month.
               <br />
-              <b>Visit (V)</b>: 访问日期（Visit Date）在当月的 Enquiry 数量。
+              <b>Visit (V)</b>: Enquiries with visit date in the selected month.
               <br />
-              <b>Enrollment (E)</b>: 创建时间在当月的 Enrolment 数量。
+              <b>Enrollment (E)</b>: Enrolments created in the selected month.
               <br />
-              <b>Starters (S)</b>: 入学月份（Intake）与当月匹配的 Enrollment 数量（仅限 2月、5月、8月、11月）。
+              <b>Starters (S)</b>: Enrolments whose intake month matches the selected month (Feb, May, Aug, Nov only).
             </div>
           </div>
         </>

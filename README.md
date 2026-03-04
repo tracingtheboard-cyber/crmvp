@@ -34,13 +34,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
-### 4. Run the Development Server
+### 4. Enable Login (Supabase Auth)
+
+1. In Supabase Dashboard go to **Authentication** → **Providers** and enable **Email**.
+2. Create a user: **Authentication** → **Users** → **Add user** (email + password), or sign up via the app if you enable "Confirm email" off for testing.
+3. Unauthenticated visitors are redirected to `/login`. After signing in, they can access the app and use **退出** in the nav to sign out.
+
+### 5. Run the Development Server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000). You will be redirected to the login page if not signed in.
 
 ## Database Schema
 

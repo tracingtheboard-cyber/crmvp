@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Enquiry, Lead } from '@/types';
+import { Enquiry } from '@/types';
 
 interface EnquiryFormProps {
   enquiry?: Enquiry | null;
@@ -9,55 +9,109 @@ interface EnquiryFormProps {
   onSave: () => void;
 }
 
+const COURSE_OPTIONS = [
+  'FCEEC',
+  'FCMEC',
+  'A3EEY',
+  'H2EIC',
+  'H2MIC',
+  'P7EET',
+  'P7MET',
+  'SDESE',
+  'SDMSE',
+  'Y3BCU',
+] as const;
+
+const CONSULTANT_OPTIONS = ['Ashik', 'Mike', 'Nisha'];
+
+interface SimpleFormData {
+  name: string;
+  phone: string;
+  email: string;
+  course_interest: string;
+  consultant: string;
+}
+
 export default function EnquiryForm({ enquiry, onClose, onSave }: EnquiryFormProps) {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [formData, setFormData] = useState<Partial<Enquiry>>({
-    lead_id: undefined,
-    subject: '',
-    message: '',
-    status: 'open',
-    priority: 'medium',
-    assigned_to: '',
+  const [formData, setFormData] = useState<SimpleFormData>({
+    name: '',
+    phone: '',
+    email: '',
+    course_interest: '',
+    consultant: '',
   });
 
+  const [customConsultant, setCustomConsultant] = useState(false);
+
+  const courseOptions =
+    formData.course_interest && !COURSE_OPTIONS.includes(formData.course_interest as any)
+      ? [formData.course_interest, ...COURSE_OPTIONS]
+      : COURSE_OPTIONS;
+
+  const consultantOptions =
+    formData.consultant && !CONSULTANT_OPTIONS.includes(formData.consultant)
+      ? [formData.consultant, ...CONSULTANT_OPTIONS]
+      : CONSULTANT_OPTIONS;
+
   useEffect(() => {
-    fetchLeads();
     if (enquiry) {
-      setFormData(enquiry);
+      setFormData({
+        name: enquiry.lead?.name ?? '',
+        phone: enquiry.lead?.phone ?? '',
+        email: enquiry.lead?.email ?? '',
+        course_interest: enquiry.subject ?? '',
+        consultant: enquiry.assigned_to ?? '',
+      });
+      setCustomConsultant(false);
     }
   }, [enquiry]);
-
-  const fetchLeads = async () => {
-    try {
-      const res = await fetch('/api/leads');
-      const data = await res.json();
-      setLeads(data);
-    } catch (error) {
-      console.error('Error fetching leads:', error);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = enquiry?.id ? `/api/enquiries/${enquiry.id}` : '/api/enquiries';
-      const method = enquiry?.id ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (res.ok) {
-        onSave();
+      if (enquiry?.id) {
+        const leadId = enquiry.lead_id ?? enquiry.lead?.id;
+        if (leadId) {
+          await fetch(`/api/leads/${leadId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: formData.name.trim(),
+              phone: formData.phone.trim() || undefined,
+              email: formData.email.trim() || undefined,
+            }),
+          });
+        }
+        await fetch(`/api/enquiries/${enquiry.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subject: formData.course_interest.trim(),
+            assigned_to: formData.consultant.trim(),
+          }),
+        });
       } else {
-        const error = await res.json();
-        alert('Error: ' + error.error);
+        const res = await fetch('/api/enquiries/quick', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name.trim(),
+            phone: formData.phone.trim() || undefined,
+            email: formData.email.trim() || undefined,
+            course_interest: formData.course_interest.trim(),
+            consultant: formData.consultant.trim(),
+          }),
+        });
+        if (!res.ok) {
+          const err = await res.json();
+          alert(err.error || 'Failed to add enquiry');
+          return;
+        }
       }
+      onSave();
     } catch (error) {
       console.error('Error saving enquiry:', error);
-      alert('Error saving enquiry');
+      alert('Failed to save');
     }
   };
 
@@ -65,115 +119,98 @@ export default function EnquiryForm({ enquiry, onClose, onSave }: EnquiryFormPro
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4">
-          {enquiry ? 'Edit Enquiry' : 'Add New Enquiry'}
+          {enquiry ? 'Edit Enquiry' : 'Add Enquiry'}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Lead</label>
-            <select
-              value={formData.lead_id || ''}
-              onChange={(e) => setFormData({ ...formData, lead_id: e.target.value ? Number(e.target.value) : undefined })}
+            <label className="block text-sm font-medium mb-1">Name *</label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-3 py-2 border rounded-lg"
+              placeholder="Enter name"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Phone</label>
+            <input
+              type="text"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="Enter phone"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Email</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg"
+              placeholder="Enter email"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Course code *</label>
+            <select
+              required
+              value={formData.course_interest}
+              onChange={(e) =>
+                setFormData({ ...formData, course_interest: e.target.value })
+              }
+              className="w-full px-3 py-2 border rounded-lg bg-white"
             >
-              <option value="">Select a lead</option>
-              {leads.map((lead) => (
-                <option key={lead.id} value={lead.id}>
-                  {lead.name}
+              <option value="">Select a course code</option>
+              {courseOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
                 </option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Subject *</label>
-            <input
-              type="text"
-              required
-              value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Message</label>
-            <textarea
-              value={formData.message || ''}
-              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg"
-              rows={4}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
+            <label className="block text-sm font-medium mb-1">Consultant *</label>
             <select
-              value={formData.status}
+              required={!customConsultant}
+              value={customConsultant ? '__other__' : formData.consultant}
               onChange={(e) => {
-                const newStatus = e.target.value as Enquiry['status'];
-                const updates: Partial<Enquiry> = { status: newStatus };
-                if (newStatus === 'visit' && !formData.visit_date) {
-                  updates.visit_date = new Date().toISOString().split('T')[0]; // Default to today
+                const v = e.target.value;
+                if (v === '__other__') {
+                  setCustomConsultant(true);
+                  setFormData({ ...formData, consultant: '' });
+                } else {
+                  setCustomConsultant(false);
+                  setFormData({ ...formData, consultant: v });
                 }
-                setFormData({ ...formData, ...updates });
               }}
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-2 border rounded-lg bg-white"
             >
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="visit">Visit</option>
-              <option value="resolved">Resolved</option>
-              <option value="closed">Closed</option>
+              <option value="">Select a consultant</option>
+              {consultantOptions.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+              <option value="__other__">Other...</option>
             </select>
-          </div>
 
-          {formData.status === 'visit' && (
-            <div className="grid grid-cols-2 gap-4 pl-4 border-l-2 border-green-200">
-              <div>
-                <label className="block text-sm font-medium mb-1">Visit Date *</label>
+            {customConsultant && (
+              <div className="mt-2">
                 <input
-                  type="date"
-                  required={formData.status === 'visit'}
-                  value={formData.visit_date ? new Date(formData.visit_date).toISOString().split('T')[0] : ''}
-                  onChange={(e) => setFormData({ ...formData, visit_date: e.target.value })}
+                  type="text"
+                  required
+                  value={formData.consultant}
+                  onChange={(e) => setFormData({ ...formData, consultant: e.target.value })}
                   className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="Enter consultant name"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Visit Type</label>
-                <select
-                  value={formData.visit_type || ''}
-                  onChange={(e) => setFormData({ ...formData, visit_type: e.target.value as any })}
-                  className="w-full px-3 py-2 border rounded-lg"
-                >
-                  <option value="">Select Type...</option>
-                  <option value="walkin">Walk-in</option>
-                  <option value="call">Call</option>
-                </select>
-              </div>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Priority</label>
-            <select
-              value={formData.priority}
-              onChange={(e) => setFormData({ ...formData, priority: e.target.value as Enquiry['priority'] })}
-              className="w-full px-3 py-2 border rounded-lg"
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
+            )}
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Assigned To</label>
-            <input
-              type="text"
-              value={formData.assigned_to || ''}
-              onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-              className="w-full px-3 py-2 border rounded-lg"
-              placeholder="Staff name"
-            />
-          </div>
-          <div className="flex justify-end space-x-2">
+          <div className="flex justify-end space-x-2 pt-2">
             <button
               type="button"
               onClick={onClose}

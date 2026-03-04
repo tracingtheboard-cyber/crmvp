@@ -98,6 +98,13 @@ export default function LeadsPage() {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Enquiries (Imported)</h1>
         <div className="flex space-x-2">
+          <a
+            href="/templates/leads_template.csv"
+            download
+            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 flex items-center"
+          >
+            📄 Download Template
+          </a>
           <button
             onClick={() => setShowImport(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"

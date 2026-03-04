@@ -143,7 +143,14 @@ export default function EnquiryImport({ onImportComplete, onClose }: EnquiryImpo
                         className="w-full px-3 py-2 border rounded-lg"
                     />
                     <p className="text-xs text-gray-500 mt-2">
-                        CSV should have headers like: subject, message, status (e.g. open), priority (e.g. medium), lead_email (to link to lead)
+                        CSV should have headers like: subject, message, status, priority, lead_email, lead_name.
+                        <a
+                            href="/templates/enquiries_template.csv"
+                            download
+                            className="text-blue-600 hover:underline ml-1 font-medium"
+                        >
+                            Download Template
+                        </a>
                     </p>
                 </div>
 

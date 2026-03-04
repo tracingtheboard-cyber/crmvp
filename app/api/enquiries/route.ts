@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const { data, error } = await supabaseAdmin
       .from('enquiries')
-      .select('*, leads(*)')
+      .select('*, lead:leads!lead_id(*)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

@@ -1,0 +1,4 @@
+subject,message,status,priority,lead_email,lead_name
+Course Inquiry,Interested in Bachelor of Business,open,medium,john.doe@example.com,John Doe
+Admission Question,When is the next intake?,in_progress,high,jane.smith@example.com,Jane Smith
+Fees Inquiry,Can I get a scholarship?,open,low,bob@example.com,Bob Johnson

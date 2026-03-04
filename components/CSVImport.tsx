@@ -135,7 +135,7 @@ export default function CSVImport({ onImportComplete, onClose }: CSVImportProps)
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">Import Enquiries from CSV</h2>
+        <h2 className="text-2xl font-bold mb-4">Import Leads from CSV</h2>
 
         <div className="mb-4">
           <label className="block text-sm font-medium mb-2">
@@ -148,7 +148,14 @@ export default function CSVImport({ onImportComplete, onClose }: CSVImportProps)
             className="w-full px-3 py-2 border rounded-lg"
           />
           <p className="text-xs text-gray-500 mt-2">
-            CSV should have columns: name, email, phone, company, source, status, notes
+            CSV should have columns: name, email, phone, company, source, status, notes.
+            <a
+              href="/templates/leads_template.csv"
+              download
+              className="text-blue-600 hover:underline ml-1 font-medium"
+            >
+              Download Template
+            </a>
           </p>
         </div>
 

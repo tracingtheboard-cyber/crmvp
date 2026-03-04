@@ -10,7 +10,7 @@ export async function GET(
     const { id } = await params;
     const { data, error } = await supabaseAdmin
       .from('enrolments')
-      .select('*, leads(*)')
+      .select('*, lead:leads!lead_id(*)')
       .eq('id', id)
       .single();
 
